@@ -53,21 +53,28 @@ public class ValidarUsuario extends HttpServlet {
         encontrado = usuarioDAO.validarCredenciales(nombre, contrasenia);
 
         if (encontrado) {
-            //Establezco los atributos de sesión
+            // Establezco los atributos de sesión
             HttpSession session = request.getSession();
             session.setAttribute("usuarioLogueado", true);
             session.setAttribute("username", nombre);
 
-            Usuario usuario = usuarioDAO.obtenerUsuarioPorNombre(nombre);
+            // Busco el usuario en el ArrayList utilizando las credenciales
+            Usuario usuarioEncontrado = null;
+            for (Usuario usuario : misUsuarios) {
+                if (usuario.getUsername().equals(nombre) && usuario.getPassword().equals(contrasenia)) {
+                    usuarioEncontrado = usuario;
+                    break;
+                }
+            }
 
-            //Consulto los demás datos del usuario y los añado a la sesión
-            if (usuario != null) {
-                session.setAttribute("id_usuario", usuario.getId_usuario());
-                session.setAttribute("esAdministrador", usuario.isEs_administrador());
-                session.setAttribute("saldo", usuario.getSaldo());
+            // Consulto los demás datos del usuario y los añado a la sesión
+            if (usuarioEncontrado != null) {
+                session.setAttribute("id_usuario", usuarioEncontrado.getId_usuario());
+                session.setAttribute("esAdministrador", usuarioEncontrado.isEs_administrador());
+                session.setAttribute("saldo", usuarioEncontrado.getSaldo());
 
-                //Compruebo si es administrador
-                if (usuario.isEs_administrador()) {
+                // Compruebo si es administrador
+                if (usuarioEncontrado.isEs_administrador()) {
                     response.sendRedirect("menuAdmin.jsp");
                 } else {
                     response.sendRedirect("menuUsuario.jsp");
