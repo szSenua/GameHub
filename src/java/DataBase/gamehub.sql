@@ -1,0 +1,143 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 11-12-2023 a las 18:42:24
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `gamehub`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `consolas`
+--
+
+CREATE TABLE `consolas` (
+  `id_consola` int(11) NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `potencia_cpu` varchar(255) DEFAULT NULL,
+  `potencia_gpu` varchar(255) DEFAULT NULL,
+  `compania` varchar(255) DEFAULT NULL,
+  `precio` decimal(10,2) DEFAULT NULL,
+  `unidades_disponibles` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `juegos`
+--
+
+CREATE TABLE `juegos` (
+  `id_juego` int(11) NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `compania_desarrolladora` varchar(255) DEFAULT NULL,
+  `genero` varchar(255) DEFAULT NULL,
+  `puntuacion_metacritic` int(11) DEFAULT NULL,
+  `precio` decimal(10,2) DEFAULT NULL,
+  `unidades_disponibles` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `juegos_plataformas`
+--
+
+CREATE TABLE `juegos_plataformas` (
+  `id_juego` int(11) DEFAULT NULL,
+  `id_consola` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuarios`
+--
+
+CREATE TABLE `usuarios` (
+  `id_usuario` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `es_administrador` tinyint(1) DEFAULT NULL,
+  `saldo` decimal(10,2) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`id_usuario`, `username`, `password`, `es_administrador`, `saldo`) VALUES
+(1, 'Senua', '1234', 1, 100.00),
+(2, 'Senua2', '1234', 0, 100.00);
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `consolas`
+--
+ALTER TABLE `consolas`
+  ADD PRIMARY KEY (`id_consola`);
+
+--
+-- Indices de la tabla `juegos`
+--
+ALTER TABLE `juegos`
+  ADD PRIMARY KEY (`id_juego`);
+
+--
+-- Indices de la tabla `juegos_plataformas`
+--
+ALTER TABLE `juegos_plataformas`
+  ADD KEY `id_juego` (`id_juego`),
+  ADD KEY `id_consola` (`id_consola`);
+
+--
+-- Indices de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id_usuario`),
+  ADD UNIQUE KEY `unique_username` (`username`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `juegos_plataformas`
+--
+ALTER TABLE `juegos_plataformas`
+  ADD CONSTRAINT `juegos_plataformas_ibfk_1` FOREIGN KEY (`id_juego`) REFERENCES `juegos` (`id_juego`),
+  ADD CONSTRAINT `juegos_plataformas_ibfk_2` FOREIGN KEY (`id_consola`) REFERENCES `consolas` (`id_consola`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
