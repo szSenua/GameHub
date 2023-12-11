@@ -9,18 +9,23 @@ package Entity;
  * @author SzBel
  */
 public class Usuario {
+     public enum RolUsuario {
+        Administrador,
+        Usuario
+    }
+    
     
    private int id_usuario;
    private String username;
    private String password;
-   private boolean es_administrador;
+   private RolUsuario tipodeusuario;
    private double saldo;
 
-    public Usuario(int id_usuario, String username, String password, boolean es_administrador, double saldo) {
+    public Usuario(int id_usuario, String username, String password, RolUsuario tipodeusuario, double saldo) {
         this.id_usuario = id_usuario;
         this.username = username;
         this.password = password;
-        this.es_administrador = es_administrador;
+        this.tipodeusuario = tipodeusuario;
         this.saldo = saldo;
     }
     
@@ -28,7 +33,7 @@ public class Usuario {
         this.id_usuario = id_usuario;
         this.username = username;
         this.password = password;
-        this.es_administrador = es_administrador;
+        this.tipodeusuario = tipodeusuario;
         this.saldo = saldo;
     }
 
@@ -56,14 +61,15 @@ public class Usuario {
         this.password = password;
     }
 
-    public boolean isEs_administrador() {
-        return es_administrador;
+    public RolUsuario getTipodeusuario() {
+        return tipodeusuario;
     }
 
-    public void setEs_administrador(boolean es_admin) {
-        this.es_administrador = es_administrador;
+    public void setTipodeusuario(RolUsuario tipodeusuario) {
+        this.tipodeusuario = tipodeusuario;
     }
 
+  
     public double getSaldo() {
         return saldo;
     }

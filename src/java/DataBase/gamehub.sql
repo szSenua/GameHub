@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-12-2023 a las 18:42:24
+-- Tiempo de generación: 11-12-2023 a las 20:16:14
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -74,7 +74,7 @@ CREATE TABLE `usuarios` (
   `id_usuario` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `es_administrador` tinyint(1) DEFAULT NULL,
+  `tipodeusuario` enum('Administrador','Usuario','','') DEFAULT 'Usuario',
   `saldo` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -82,9 +82,9 @@ CREATE TABLE `usuarios` (
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id_usuario`, `username`, `password`, `es_administrador`, `saldo`) VALUES
-(1, 'Senua', '1234', 1, 100.00),
-(2, 'Senua2', '1234', 0, 100.00);
+INSERT INTO `usuarios` (`id_usuario`, `username`, `password`, `tipodeusuario`, `saldo`) VALUES
+(1, 'Senua', '1234', 'Administrador', 100.00),
+(2, 'Senua2', '1234', 'Usuario', 100.00);
 
 --
 -- Índices para tablas volcadas

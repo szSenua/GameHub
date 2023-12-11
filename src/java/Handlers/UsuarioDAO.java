@@ -36,17 +36,23 @@ public class UsuarioDAO {
             PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
             ResultSet resultSet = preparedStatement.executeQuery();
             
-            while (resultSet.next()){
-                Usuario usuario = new Usuario(
-                resultSet.getInt("id_usuario"),
-                resultSet.getString("username"),
-                resultSet.getString("password"),
-                resultSet.getBoolean("es_administrador"),
-                resultSet.getDouble("saldo")
-                );
-                
-                listaUsuarios.add(usuario);
-            }
+            while (resultSet.next()) {
+            int idUsuario = resultSet.getInt("id_usuario");
+            String username = resultSet.getString("username");
+            String password = resultSet.getString("password");
+            
+            // Obtener string del tipo de usuario desde la bd
+            String tipoUsuarioString = resultSet.getString("tipodeusuario");
+            
+            // Convertir el String a un valor del enum RolUsuario
+            Usuario.RolUsuario tipodeusuario = Usuario.RolUsuario.valueOf(tipoUsuarioString);
+            
+            double saldo = resultSet.getDouble("saldo");
+
+            Usuario usuario = new Usuario(idUsuario, username, password, tipodeusuario, saldo);
+
+            listaUsuarios.add(usuario);
+        }
             
         } catch (SQLException ex) {
             System.out.println("Error al obtener todos los usuarios: " + ex.getMessage());
