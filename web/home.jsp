@@ -14,37 +14,27 @@
     </head>
     <body>
         <%
-            //Obtengo la sesión
-
+            // Obtengo la sesión
             session = request.getSession();
 
-            //Verificar si hay un usuario logueado
+            // Verificar si hay un usuario logueado
             if (session.getAttribute("usuarioLogueado") != null && (boolean) session.getAttribute("usuarioLogueado")) {
-                //Obtener el tipo de usuario
-                Usuario.RolUsuario rolUsuario = (Usuario.RolUsuario) session.getAttribute("tipodeusuario");
+                // Obtener el objeto Usuario de la sesión
+                Usuario usuario = (Usuario) session.getAttribute("usuario");
 
-                if (rolUsuario == Usuario.RolUsuario.Administrador) {
+                // Utilizar los atributos del objeto Usuario
+                String nombreUsuario = usuario.getUsername();
+                Usuario.RolUsuario rolUsuario = usuario.getTipodeusuario();
 
-        %>
-        <h1>Eres admin</h1>
-        <%                } else if (rolUsuario == Usuario.RolUsuario.Usuario) {
-
-        %>
-        <h1>Eres usuario</h1>
-
-        <%            }
-
-        } else {
-        %>
-        <h1>Eres un invitado</h1>
-        <%
+                %>
+                <h1>Bienvenido, <%= nombreUsuario %></h1>
+                <p>Tu rol es: <%= rolUsuario %></p>
+                <%
+            } else {
+                %>
+                <h1>Eres un invitado</h1>
+                <%
             }
-
-
         %>
-
-
-
-
     </body>
 </html>
