@@ -38,34 +38,45 @@ public class ValidarUsuario extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
-        // Obtengo los parámetros del login
+        //Obtengo los parámetros del login
         String nombre = request.getParameter("usuario");
         String contrasenia = request.getParameter("password");
+        boolean encontrado;
 
-        // Llamo al método de obtener usuarios
+        //Llamo al método de obtener usuarios
         Conexion miConexion = new Conexion();
         miConexion.conectar();
-        UsuarioDAO usuarioDAO = new UsuarioDAO(miConexion);
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
 
         ArrayList<Usuario> misUsuarios = usuarioDAO.obtenerUsuarios();
 
-        // Busco el usuario en el ArrayList utilizando las credenciales
-        Usuario usuarioEncontrado = null;
-        for (Usuario usuario : misUsuarios) {
-            if (usuario.getUsername().equals(nombre) && usuario.getPassword().equals(contrasenia)) {
-                usuarioEncontrado = usuario;
-                break;
-            }
-        }
+        encontrado = usuarioDAO.validarCredenciales(nombre, contrasenia);
 
-        if (usuarioEncontrado != null) {
-            // Establezco el objeto Usuario en la sesión
+        if (encontrado) {
+            // Establezco los atributos de sesión
             HttpSession session = request.getSession();
-            session.setAttribute("usuario", usuarioEncontrado);
             session.setAttribute("usuarioLogueado", true);
+            session.setAttribute("username", nombre);
 
-            // Redirijo a home
-            response.sendRedirect("home.jsp");
+            // Busco el usuario en el ArrayList utilizando las credenciales
+            Usuario usuarioEncontrado = null;
+            for (Usuario usuario : misUsuarios) {
+                if (usuario.getUsername().equals(nombre) && usuario.getPassword().equals(contrasenia)) {
+                    usuarioEncontrado = usuario;
+                    break;
+                }
+            }
+
+            // Consulto los demás datos del usuario y los añado a la sesión
+            if (usuarioEncontrado != null) {
+                session.setAttribute("id_usuario", usuarioEncontrado.getId_usuario());
+                session.setAttribute("tipodeusuario", usuarioEncontrado.getTipodeusuario());
+                session.setAttribute("saldo", usuarioEncontrado.getSaldo());
+
+                //Redirijo a home
+                response.sendRedirect("home.jsp");
+
+            }
         } else {
             out.println("El usuario no existe");
         }
