@@ -99,7 +99,7 @@ public class UsuarioDAO {
                 preparedStatement.setInt(2, usuario.getId_usuario());
                 preparedStatement.setInt(3, cantidad);
 
-                // Acceder al atributo id directamente, asumiendo que existe en las subclases
+                // Acceder al atributo id directamente
                 int idProducto = (producto instanceof Consola) ? ((Consola) producto).getId_consola() : ((Juego) producto).getId_juego();
                 preparedStatement.setInt(4, idProducto);
 

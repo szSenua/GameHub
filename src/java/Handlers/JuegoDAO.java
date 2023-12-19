@@ -104,11 +104,11 @@ public class JuegoDAO {
      * @param juegoModificado
      * @return
      */
-    public boolean modificaJuego(Juego juegoModificado) {
+    public boolean modificaJuego(int id, Juego juegoModificado) {
         try {
             // Preparar la consulta SQL para la actualización
             String query = "UPDATE juegos SET nombre=?, compania_desarrolladora=?, genero=?, puntuacion_metacritic=?, precio=?, unidades_disponibles=? "
-                    + "WHERE id_juego=?";
+                    + "WHERE " + id + " = ?";
 
             PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
 

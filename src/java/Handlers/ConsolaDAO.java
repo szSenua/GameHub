@@ -105,11 +105,11 @@ public class ConsolaDAO {
      * @param consolaModificada
      * @return
      */
-    public boolean modificaConsola(Consola consolaModificada) {
+    public boolean modificaConsola(int id, Consola consolaModificada) {
         try {
             // Preparar la consulta SQL para la actualización
             String query = "UPDATE consolas SET nombre=?, potencia_cpu=?, potencia_gpu=?, compania=?, precio=?, unidades_disponibles=? "
-                    + "WHERE id_consola=?";
+                    + "WHERE " + id +" = ?";
 
             PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
 
