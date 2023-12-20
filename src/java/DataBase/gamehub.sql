@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-12-2023 a las 20:16:14
+-- Tiempo de generación: 20-12-2023 a las 23:21:11
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -37,6 +37,13 @@ CREATE TABLE `consolas` (
   `unidades_disponibles` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `consolas`
+--
+
+INSERT INTO `consolas` (`id_consola`, `nombre`, `potencia_cpu`, `potencia_gpu`, `compania`, `precio`, `unidades_disponibles`) VALUES
+(1, 'PlayStation 5', 'AMD Ryzen Zen 2, 8 núcleos, 16 hilos, 3.5 GHz', 'AMD RDNA 2, 36 unidades de cómputo, 2.23 GHz', 'Sony', 499.99, 100);
+
 -- --------------------------------------------------------
 
 --
@@ -53,6 +60,14 @@ CREATE TABLE `juegos` (
   `unidades_disponibles` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `juegos`
+--
+
+INSERT INTO `juegos` (`id_juego`, `nombre`, `compania_desarrolladora`, `genero`, `puntuacion_metacritic`, `precio`, `unidades_disponibles`) VALUES
+(1, 'Final Fantasy VIII', 'Square Enix', 'Fantasía', 90, 20.00, 5),
+(2, 'Final Fantasy VII Reunion', 'Square Enix', 'Fantasía', 90, 50.00, 7);
+
 -- --------------------------------------------------------
 
 --
@@ -63,6 +78,13 @@ CREATE TABLE `juegos_plataformas` (
   `id_juego` int(11) DEFAULT NULL,
   `id_consola` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `juegos_plataformas`
+--
+
+INSERT INTO `juegos_plataformas` (`id_juego`, `id_consola`) VALUES
+(2, 1);
 
 -- --------------------------------------------------------
 
@@ -119,6 +141,18 @@ ALTER TABLE `usuarios`
 --
 -- AUTO_INCREMENT de las tablas volcadas
 --
+
+--
+-- AUTO_INCREMENT de la tabla `consolas`
+--
+ALTER TABLE `consolas`
+  MODIFY `id_consola` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `juegos`
+--
+ALTER TABLE `juegos`
+  MODIFY `id_juego` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
