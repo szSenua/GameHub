@@ -31,7 +31,7 @@ public class JuegoDAO {
      */
     public ArrayList<Juego> obtenerJuegos() {
         try {
-            String query = "SELECT * FROM juegos";
+            String query = "SELECT * FROM juegos ORDER BY juegos.nombre";
             PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -183,9 +183,10 @@ public class JuegoDAO {
         ArrayList<Juego> juegosPorConsola = new ArrayList<>();
         try {
             // Preparar la consulta SQL para obtener juegos por consola
-            String query = "SELECT juegos.* FROM juegos "
-                    + "INNER JOIN juegos_plataformas ON juegos.id_juego = juegos_plataformas.id_juego "
-                    + "WHERE juegos_plataformas.id_consola = ?";
+             String query = "SELECT juegos.* FROM juegos "
+                + "INNER JOIN juegos_plataformas ON juegos.id_juego = juegos_plataformas.id_juego "
+                + "WHERE juegos_plataformas.id_consola = ? "
+                + "ORDER BY juegos.nombre";
             PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
 
             // Establecer el valor del parámetro

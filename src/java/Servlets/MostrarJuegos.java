@@ -5,8 +5,8 @@
 package Servlets;
 
 import Conexion.Conexion;
-import Entity.Usuario;
-import Handlers.UsuarioDAO;
+import Entity.Juego;
+import Handlers.JuegoDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -15,14 +15,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author SzBel
  */
-@WebServlet(name = "ValidarUsuario", urlPatterns = {"/ValidarUsuario"})
-public class ValidarUsuario extends HttpServlet {
+@WebServlet(name = "MostrarJuegos", urlPatterns = {"/MostrarJuegos"})
+public class MostrarJuegos extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -36,42 +35,22 @@ public class ValidarUsuario extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-
-        // Obtengo los parámetros del login
-        String nombre = request.getParameter("usuario");
-        String contrasenia = request.getParameter("password");
-
-        // Llamo al método de obtener usuarios
+        // Conectar a la base de datos
         Conexion miConexion = new Conexion();
         miConexion.conectar();
-        UsuarioDAO usuarioDAO = new UsuarioDAO(miConexion);
+        JuegoDAO juegoDAO = new JuegoDAO(miConexion);
 
-        ArrayList<Usuario> misUsuarios = usuarioDAO.obtenerUsuarios();
+        // Obtener la lista de juegos
+        ArrayList<Juego> listaJuegos = juegoDAO.obtenerJuegos();
 
-        // Busco el usuario en el ArrayList utilizando las credenciales
-        Usuario usuarioEncontrado = null;
-        for (Usuario usuario : misUsuarios) {
-            if (usuario.getUsername().equals(nombre) && usuario.getPassword().equals(contrasenia)) {
-                usuarioEncontrado = usuario;
-                break;
-            }
-        }
-
-        if (usuarioEncontrado != null) {
-            // Establezco el objeto Usuario en la sesión
-            HttpSession session = request.getSession();
-            session.setAttribute("usuario", usuarioEncontrado);
-            session.setAttribute("usuarioLogueado", true);
-
-            // Redirijo a index
-            response.sendRedirect("index.jsp");
-        } else {
-            out.println("El usuario no existe");
-        }
-
+        // Colocar la lista en el atributo de la solicitud para mostrarla en el JSP
+        request.setAttribute("listaJuegos", listaJuegos);
+        
+        // Cerrar la conexión
         miConexion.desconectar();
 
+        // Redirigir a la página que mostrará la lista de juegos
+        request.getRequestDispatcher("/mostrarJuegos.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -86,11 +65,7 @@ public class ValidarUsuario extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //processRequest(request, response);
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        //out.println("Método no permitido");
-        response.sendRedirect("login.jsp");
+        processRequest(request, response);
     }
 
     /**
