@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 20-12-2023 a las 23:21:11
+-- Tiempo de generación: 26-12-2023 a las 20:25:26
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -42,7 +42,8 @@ CREATE TABLE `consolas` (
 --
 
 INSERT INTO `consolas` (`id_consola`, `nombre`, `potencia_cpu`, `potencia_gpu`, `compania`, `precio`, `unidades_disponibles`) VALUES
-(1, 'PlayStation 5', 'AMD Ryzen Zen 2, 8 núcleos, 16 hilos, 3.5 GHz', 'AMD RDNA 2, 36 unidades de cómputo, 2.23 GHz', 'Sony', 499.99, 100);
+(1, 'PlayStation 5', 'AMD Ryzen Zen 2, 8 núcleos, 16 hilos, 3.5 GHz', 'AMD RDNA 2, 36 unidades de cómputo, 2.23 GHz', 'Sony', 499.99, 100),
+(2, 'Xbox Series X', 'AMD Zen 2 Octa-core a 3.8 GHz', 'AMD RDNA 2, 12 TFLOPs', 'Microsoft', 499.00, 100);
 
 -- --------------------------------------------------------
 
@@ -84,7 +85,30 @@ CREATE TABLE `juegos_plataformas` (
 --
 
 INSERT INTO `juegos_plataformas` (`id_juego`, `id_consola`) VALUES
-(2, 1);
+(2, 1),
+(1, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tickets`
+--
+
+CREATE TABLE `tickets` (
+  `ticket_id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `ticket_items`
+--
+
+CREATE TABLE `ticket_items` (
+  `ticket_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -132,6 +156,19 @@ ALTER TABLE `juegos_plataformas`
   ADD KEY `id_consola` (`id_consola`);
 
 --
+-- Indices de la tabla `tickets`
+--
+ALTER TABLE `tickets`
+  ADD PRIMARY KEY (`ticket_id`),
+  ADD KEY `fk_tickets_usuarios` (`id_usuario`);
+
+--
+-- Indices de la tabla `ticket_items`
+--
+ALTER TABLE `ticket_items`
+  ADD KEY `fk_ticket_items_tickets` (`ticket_id`);
+
+--
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -146,13 +183,19 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `consolas`
 --
 ALTER TABLE `consolas`
-  MODIFY `id_consola` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_consola` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `juegos`
 --
 ALTER TABLE `juegos`
   MODIFY `id_juego` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `tickets`
+--
+ALTER TABLE `tickets`
+  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
@@ -170,6 +213,18 @@ ALTER TABLE `usuarios`
 ALTER TABLE `juegos_plataformas`
   ADD CONSTRAINT `juegos_plataformas_ibfk_1` FOREIGN KEY (`id_juego`) REFERENCES `juegos` (`id_juego`),
   ADD CONSTRAINT `juegos_plataformas_ibfk_2` FOREIGN KEY (`id_consola`) REFERENCES `consolas` (`id_consola`);
+
+--
+-- Filtros para la tabla `tickets`
+--
+ALTER TABLE `tickets`
+  ADD CONSTRAINT `fk_tickets_usuarios` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
+
+--
+-- Filtros para la tabla `ticket_items`
+--
+ALTER TABLE `ticket_items`
+  ADD CONSTRAINT `fk_ticket_items_tickets` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`ticket_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

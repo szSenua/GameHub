@@ -52,9 +52,7 @@ public class ConsolaDAO {
 
         } catch (SQLException ex) {
             System.out.println("Error al obtener todos las consolas: " + ex.getMessage());
-        } finally {
-            miConexion.desconectar();
-        }
+        } 
 
         return listaConsolas;
     }

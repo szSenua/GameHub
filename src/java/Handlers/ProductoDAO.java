@@ -19,10 +19,12 @@ public class ProductoDAO {
 
     private ConsolaDAO consolaDAO;
     private JuegoDAO juegoDAO;
+    
 
     public ProductoDAO(Conexion miConexion) {
         this.consolaDAO = new ConsolaDAO(miConexion);
         this.juegoDAO = new JuegoDAO(miConexion);
+
     }
 
     /**
@@ -143,4 +145,9 @@ public class ProductoDAO {
         return null; // No encontró nada
     }
 
+
+
+
+    
+    
 }

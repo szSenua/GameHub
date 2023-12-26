@@ -9,6 +9,8 @@ import Entity.Juego;
 import Entity.Producto;
 import java.util.ArrayList;
 import java.sql.*;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -51,9 +53,7 @@ public class JuegoDAO {
 
         } catch (SQLException ex) {
             System.out.println("Error al obtener todos los juegos: " + ex.getMessage());
-        } finally {
-            miConexion.desconectar();
-        }
+        } 
 
         return listaJuegos;
     }
@@ -175,45 +175,48 @@ public class JuegoDAO {
 
     /**
      * Función que obtiene los juegos por consola
-     *
-     * @param idConsola obtenido de los values de un select
-     * @return
+     * @param idConsolas
+     * @return 
      */
-    public ArrayList<Juego> obtenerJuegosPorConsola(int idConsola) {
-        ArrayList<Juego> juegosPorConsola = new ArrayList<>();
-        try {
-            // Preparar la consulta SQL para obtener juegos por consola
-             String query = "SELECT juegos.* FROM juegos "
+    public ArrayList<Juego> obtenerJuegosPorConsolas(List<Integer> idConsolas) {
+    ArrayList<Juego> juegosPorConsolas = new ArrayList<>();
+    try {
+        // Crear una cadena de marcadores de posición para la consulta IN
+        String placeholders = String.join(",", Collections.nCopies(idConsolas.size(), "?"));
+
+        // Preparar la consulta SQL para obtener juegos por consolas
+        String query = "SELECT juegos.* FROM juegos "
                 + "INNER JOIN juegos_plataformas ON juegos.id_juego = juegos_plataformas.id_juego "
-                + "WHERE juegos_plataformas.id_consola = ? "
+                + "WHERE juegos_plataformas.id_consola IN (" + placeholders + ") "
                 + "ORDER BY juegos.nombre";
-            PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
 
-            // Establecer el valor del parámetro
-            preparedStatement.setInt(1, idConsola);
+        PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                int idJuego = resultSet.getInt("id_juego");
-                String nombre = resultSet.getString("nombre");
-                String compania = resultSet.getString("compania_desarrolladora");
-                String genero = resultSet.getString("genero");
-                int metacritic = resultSet.getInt("puntuacion_metacritic");
-                double precio = resultSet.getDouble("precio");
-                int unidadesDisponibles = resultSet.getInt("unidades_disponibles");
-
-                Juego juego = new Juego(idJuego, nombre, compania, genero, metacritic, precio, unidadesDisponibles);
-                juegosPorConsola.add(juego);
-            }
-
-        } catch (SQLException ex) {
-            System.out.println("Error al obtener juegos por consola: " + ex.getMessage());
-        } finally {
-            miConexion.desconectar();
+        // Establecer los valores de los parámetros
+        for (int i = 0; i < idConsolas.size(); i++) {
+            preparedStatement.setInt(i + 1, idConsolas.get(i));
         }
 
-        return juegosPorConsola;
-    }
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()) {
+            int idJuego = resultSet.getInt("id_juego");
+            String nombre = resultSet.getString("nombre");
+            String compania = resultSet.getString("compania_desarrolladora");
+            String genero = resultSet.getString("genero");
+            int metacritic = resultSet.getInt("puntuacion_metacritic");
+            double precio = resultSet.getDouble("precio");
+            int unidadesDisponibles = resultSet.getInt("unidades_disponibles");
+
+            Juego juego = new Juego(idJuego, nombre, compania, genero, metacritic, precio, unidadesDisponibles);
+            juegosPorConsolas.add(juego);
+        }
+
+    } catch (SQLException ex) {
+        System.out.println("Error al obtener juegos por consolas: " + ex.getMessage());
+    } 
+
+    return juegosPorConsolas;
+}
 
 }

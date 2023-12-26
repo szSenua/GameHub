@@ -5,16 +5,11 @@
 package Servlets;
 
 import Conexion.Conexion;
-import Entity.Consola;
-import Entity.Juego;
-import Handlers.ConsolaDAO;
-import Handlers.JuegoDAO;
+import Entity.Producto;
+import Handlers.ProductoDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -25,8 +20,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author SzBel
  */
-@WebServlet(name = "MostrarJuegos", urlPatterns = {"/MostrarJuegos"})
-public class MostrarJuegos extends HttpServlet {
+@WebServlet(name = "MostrarProductos", urlPatterns = {"/MostrarProductos"})
+public class MostrarProductos extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,56 +36,25 @@ public class MostrarJuegos extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        
-        
-        
-        
-        // Conectar a la base de datos
         Conexion miConexion = new Conexion();
         miConexion.conectar();
-        JuegoDAO juegoDAO = new JuegoDAO(miConexion);
-        ConsolaDAO consolaDAO = new ConsolaDAO(miConexion);
-
-        // Obtener las consolas seleccionadas
-        String[] consolasSeleccionadas = request.getParameterValues("consolas");
+        ProductoDAO productodao = new ProductoDAO(miConexion);
         
-        if (request.getParameter("quitarFiltros") != null) {
-        // Si se presionó el botón, redirige a MostrarJuegos sin parámetros de consolas
-        response.sendRedirect(request.getContextPath() + "/MostrarJuegos");
-        return;
-    }
+        //Obtener la lista de Productos
+        ArrayList<Producto> listaProductos = productodao.obtenerProductos();
         
-        // Colocar las consolas seleccionadas en el atributo de la solicitud
-        request.setAttribute("consolasSeleccionadas", consolasSeleccionadas);
-
-        ArrayList<Juego> listaJuegos;
-        ArrayList<Consola> listaConsolas;
-
-        if (consolasSeleccionadas != null) {
-            // Convertir los strings a enteros
-            List<Integer> idConsolas = Arrays.stream(consolasSeleccionadas)
-                                              .map(Integer::parseInt)
-                                              .collect(Collectors.toList());
-
-            listaConsolas = consolaDAO.obtenerConsolas();
-            // Llamar al método obtenerJuegosPorConsolas con la lista de IDs de consolas
-            listaJuegos = juegoDAO.obtenerJuegosPorConsolas(idConsolas);
-        } else {
-            listaConsolas = consolaDAO.obtenerConsolas();
-            // Si no se seleccionaron consolas específicas, obtener todos los juegos
-            listaJuegos = juegoDAO.obtenerJuegos();
-        }
-
+        
+        
         // Colocar la lista en el atributo de la solicitud para mostrarla en el JSP
-        request.setAttribute("listaJuegos", listaJuegos);
-        request.setAttribute("listaConsolas", listaConsolas);
-
+        request.setAttribute("listaProductos", listaProductos);
+        
         // Cerrar la conexión
         miConexion.desconectar();
 
         // Redirigir a la página que mostrará la lista de juegos
-        request.getRequestDispatcher("/mostrarJuegos.jsp").forward(request, response);
-
+        request.getRequestDispatcher("/mostrarProductos.jsp").forward(request, response);
+        
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

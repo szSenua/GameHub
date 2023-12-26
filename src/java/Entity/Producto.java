@@ -13,11 +13,13 @@ public class Producto {
     private String nombre;
     private double precio;
     private int unidadesDisponibles;
+    private String tipoDeProducto;
 
     public Producto(String nombre, double precio, int unidadesDisponibles) {
         this.nombre = nombre;
         this.precio = precio;
         this.unidadesDisponibles = unidadesDisponibles;
+        this.tipoDeProducto = tipoDeProducto;
     }
 
     public Producto() {
@@ -50,4 +52,13 @@ public class Producto {
         this.unidadesDisponibles = unidadesDisponibles;
     }
 
+    public String getTipoDeProducto() {
+        return tipoDeProducto;
+    }
+
+    public void setTipoDeProducto(String tipoDeProducto) {
+        this.tipoDeProducto = tipoDeProducto;
+    }
+
+    
 }

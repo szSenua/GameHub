@@ -22,6 +22,7 @@ public class Juego extends Producto {
         this.compania_desarrolladora = compania_desarrolladora;
         this.genero = genero;
         this.puntuacion_metacritic = puntuacion_metacritic;
+        this.setTipoDeProducto("Juego");
     }
 
     public int getId_juego() {

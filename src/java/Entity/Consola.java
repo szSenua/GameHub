@@ -23,6 +23,7 @@ public class Consola extends Producto {
         this.potencia_cpu = potencia_cpu;
         this.potencia_gpu = potencia_gpu;
         this.compania_desarrolladora = compania_desarrolladora;
+        this.setTipoDeProducto("Consola");
 
     }
 
@@ -70,4 +71,6 @@ public class Consola extends Producto {
     public double getPrecio() {
         return super.getPrecio();
     }
+    
+    
 }
