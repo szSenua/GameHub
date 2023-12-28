@@ -3,7 +3,7 @@
     Created on : 26 dic 2023, 14:58:28
     Author     : SzBel
 --%>
-
+<%@page import="Entity.Usuario"%>
 <%@page import="java.util.Collections"%>
 <%@page import="Entity.Juego"%>
 <%@page import="Entity.Consola"%>
@@ -54,10 +54,13 @@
     </head>
     <body>
         <div class="card-container">
-            <%            ArrayList<Producto> listaProductos = (ArrayList<Producto>) request.getAttribute("listaProductos");
+            <%            
+                session = request.getSession();
+                ArrayList<Producto> listaProductos = (ArrayList<Producto>) request.getAttribute("listaProductos");
+                Usuario usuario = (Usuario) session.getAttribute("usuario");
 
                 // Ordenar la lista de productos alfabéticamente por el nombre
-                Collections.sort(listaProductos, ( p1,   p2) -> p1.getNombre().compareTo(p2.getNombre()));
+                Collections.sort(listaProductos, ( p1,         p2) -> p1.getNombre().compareTo(p2.getNombre()));
 
                 if (listaProductos != null) {
                     Iterator<Producto> iterator = listaProductos.iterator();
@@ -102,8 +105,15 @@
                     <!-- Utiliza las variables intermedias -->
                     <input type="hidden" name="tipoProducto" value="<%= tipoProducto%>" />
                     <input type="hidden" name="idProducto" value="<%= idProducto%>" />
+                    <%
+                        if (usuario != null) {
+                            Usuario.RolUsuario rolUsuario = usuario.getTipodeusuario();
 
+                            if (usuario != null && (rolUsuario == Usuario.RolUsuario.Administrador
+                                    || rolUsuario == Usuario.RolUsuario.Usuario)) { %>
                     <input type="submit" class="comprar-button" name="comprar" value="Comprar">
+                    <% }
+                        }%>
                 </form>
             </div>
             <%

@@ -52,7 +52,7 @@ public class ConsolaDAO {
 
         } catch (SQLException ex) {
             System.out.println("Error al obtener todos las consolas: " + ex.getMessage());
-        } 
+        }
 
         return listaConsolas;
     }
@@ -107,7 +107,7 @@ public class ConsolaDAO {
         try {
             // Preparar la consulta SQL para la actualización
             String query = "UPDATE consolas SET nombre=?, potencia_cpu=?, potencia_gpu=?, compania=?, precio=?, unidades_disponibles=? "
-                    + "WHERE " + id +" = ?";
+                    + "WHERE " + id + " = ?";
 
             PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
 
@@ -170,6 +170,47 @@ public class ConsolaDAO {
             System.out.println("Error al eliminar la consola: " + ex.getMessage());
             return false;
         }
+    }
+
+    /**
+     * Función que obtiene una consola por su ID
+     *
+     * @param idConsola
+     * @return la consola con el ID proporcionado o null si no se encuentra
+     */
+    public Consola obtenerConsolaPorId(int idConsola) {
+        try {
+            // Preparar la consulta SQL para la obtención de la consola por ID
+            String query = "SELECT * FROM consolas WHERE id_consola=?";
+            PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
+
+            // Establecer el valor del parámetro
+            preparedStatement.setInt(1, idConsola);
+
+            // Ejecutar la consulta de selección
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Verificar si se encontró la consola
+            if (resultSet.next()) {
+                String nombre = resultSet.getString("nombre");
+                String potenciaCPU = resultSet.getString("potencia_cpu");
+                String potenciaGPU = resultSet.getString("potencia_gpu");
+                String compania = resultSet.getString("compania");
+                double precio = resultSet.getDouble("precio");
+                int unidadesDisponibles = resultSet.getInt("unidades_disponibles");
+
+                Consola consola = new Consola(idConsola, nombre, potenciaCPU, potenciaGPU, compania,
+                        precio, unidadesDisponibles);
+
+                return consola;
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Error al obtener la consola por ID: " + ex.getMessage());
+        }
+
+        // Si no se encuentra ninguna consola con el ID proporcionado, devolver null
+        return null;
     }
 
 }

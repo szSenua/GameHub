@@ -15,6 +15,9 @@
         <%@ include file="header.jsp" %>
     </head>
     <body>
+        <% 
+        session = request.getSession();
+        %>
         
     </body>
 </html>

@@ -6,116 +6,130 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ include file="header.jsp" %>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Lista de Juegos</title>
-    <style>
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <title>Lista de Juegos</title>
+        <style>
+            .container {
+                display: flex;
+                flex-wrap: wrap;
+            }
 
-        .filters {
-            width: 15%;
-            padding: 10px;
-            box-sizing: border-box;
-        }
+            .filters {
+                width: 15%;
+                padding: 10px;
+                box-sizing: border-box;
+            }
 
-        .card-container {
-            width: 85%;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+            .card-container {
+                width: 85%;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
 
-        .card {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin: 10px;
-            width: 300px;
-            display: inline-block;
-            vertical-align: top;
-            text-align: center;
-        }
+            .card {
+                border: 1px solid #ddd;
+                padding: 10px;
+                margin: 10px;
+                width: 300px;
+                display: inline-block;
+                vertical-align: top;
+                text-align: center;
+            }
 
-        .card h3, .card p {
-            margin-bottom: 10px;
-        }
+            .card h3, .card p {
+                margin-bottom: 10px;
+            }
 
-        .comprar-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            border: none;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-<body>
-    
+            .comprar-button {
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px;
+                border: none;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+                border-radius: 5px;
+            }
+        </style>
+    </head>
+    <body>
 
-    <div class="container">
-        <!-- Filtros -->
-        <div class="filters">
-            <form action="MostrarJuegos" method="post">
-                <label>Filtrar por consolas:</label><br>
-                <% 
-                    ArrayList<Consola> listaConsolas = (ArrayList<Consola>) request.getAttribute("listaConsolas");
 
-                    if (listaConsolas != null) {
-                        for (Consola consola : listaConsolas) {
-                            String idConsola = String.valueOf(consola.getId_consola());
-                            String[] consolasSeleccionadas = (String[]) request.getAttribute("consolasSeleccionadas");
+        <div class="container">
+            <!-- Filtros -->
+            <div class="filters">
+                <form action="MostrarJuegos" method="post">
+                    <label>Filtrar por consolas:</label><br>
+                    <%                    
+                        ArrayList<Consola> listaConsolas = (ArrayList<Consola>) request.getAttribute("listaConsolas");
 
-                            // Verificar si esta consola está seleccionada
-                            String checked = (consolasSeleccionadas != null && Arrays.asList(consolasSeleccionadas).contains(idConsola)) ? "checked" : "";
+                        if (listaConsolas != null) {
+                            for (Consola consola : listaConsolas) {
+                                String idConsola = String.valueOf(consola.getId_consola());
+                                String[] consolasSeleccionadas = (String[]) request.getAttribute("consolasSeleccionadas");
+
+                                // Verificar si esta consola está seleccionada
+                                String checked = (consolasSeleccionadas != null && Arrays.asList(consolasSeleccionadas).contains(idConsola)) ? "checked" : "";
+                    %>
+                    <input type="checkbox" name="consolas" value="<%= idConsola%>" <%= checked%>>
+                    <label><%= consola.getNombre()%></label><br>
+                    <%
+                            }
+                        }
+                    %>
+                    <input type="submit" value="Filtrar">
+                    <input type="submit" name="quitarFiltros" value="Quitar Filtros">
+                </form>
+            </div>
+
+            <!-- Juegos -->
+            <div class="card-container">
+                <%
+                    session = request.getSession();
+                    ArrayList<Juego> listaJuegos = (ArrayList<Juego>) request.getAttribute("listaJuegos");
+
+                    Usuario usuario = (Usuario) session.getAttribute("usuario");
+                    if (listaJuegos != null) {
+                        Iterator<Juego> iterator = listaJuegos.iterator();
+
+                        while (iterator.hasNext()) {
+                            Juego juego = iterator.next();
+
+                            String tipoProducto = "juego";
+                            String idProducto = "J" + juego.getId_juego();
                 %>
-                <input type="checkbox" name="consolas" value="<%= idConsola%>" <%= checked%>>
-                <label><%= consola.getNombre()%></label><br>
+                <div class="card">
+                    <h3><%= juego.getNombre()%></h3>
+                    <p>ID: <%= juego.getId_juego()%></p>
+                    <p>Compañía Desarrolladora: <%= juego.getCompania_desarrolladora()%></p>
+                    <p>Género: <%= juego.getGenero()%></p>
+                    <p>Puntuación Metacritic: <%= juego.getPuntuacion_metacritic()%></p>
+                    <p>Precio: <%= juego.getPrecio()%></p>
+                    <p>Unidades Disponibles: <%= juego.getUnidadesDisponibles()%></p>
+                    <form action="agregarAlCarro" method="post">
+                        <input type="hidden" name="tipoProducto" value="<%= tipoProducto%>" />
+                        <input type="hidden" name="idProducto" value="<%= idProducto%>" />
+                        <%
+                        if (usuario != null) {
+                            Usuario.RolUsuario rolUsuario = usuario.getTipodeusuario();
+
+                            if (usuario != null && (rolUsuario == Usuario.RolUsuario.Administrador
+                                    || rolUsuario == Usuario.RolUsuario.Usuario)) { %>
+                    <input type="submit" class="comprar-button" name="comprar" value="Comprar">
+                    <% }
+                        }%>
+                    </form>
+                </div>
                 <%
                         }
                     }
                 %>
-                <input type="submit" value="Filtrar">
-                <input type="submit" name="quitarFiltros" value="Quitar Filtros">
-            </form>
-        </div>
-
-        <!-- Juegos -->
-        <div class="card-container">
-            <%
-                ArrayList<Juego> listaJuegos = (ArrayList<Juego>) request.getAttribute("listaJuegos");
-
-                if (listaJuegos != null) {
-                    Iterator<Juego> iterator = listaJuegos.iterator();
-
-                    while (iterator.hasNext()) {
-                        Juego juego = iterator.next();
-            %>
-            <div class="card">
-                <h3><%= juego.getNombre()%></h3>
-                <p>ID: <%= juego.getId_juego()%></p>
-                <p>Compañía Desarrolladora: <%= juego.getCompania_desarrolladora()%></p>
-                <p>Género: <%= juego.getGenero()%></p>
-                <p>Puntuación Metacritic: <%= juego.getPuntuacion_metacritic()%></p>
-                <p>Precio: <%= juego.getPrecio()%></p>
-                <p>Unidades Disponibles: <%= juego.getUnidadesDisponibles()%></p>
-                <form action="procesarCompra.jsp" method="post">
-                    <input type="hidden" name="idJuego" value="<%= juego.getId_juego()%>">
-                    <input type="submit" class="comprar-button" name="comprar" value="Comprar">
-                </form>
             </div>
-            <%
-                    }
-                }
-            %>
         </div>
-    </div>
-</body>
+    </body>
 </html>

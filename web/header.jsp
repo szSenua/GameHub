@@ -5,13 +5,14 @@
 --%>
 
 <%@page import="Entity.Usuario"%>
+<%@page import="Entity.Carrito"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <title>Header</title>
         <style>
-            * {
+               * {
                 padding: 0;
                 margin: 0;
                 box-sizing: border-box;
@@ -64,10 +65,12 @@
                 // Obtener el objeto Usuario de la sesión
                 Usuario usuario = (Usuario) session.getAttribute("usuario");
 
+                // Obtener el carrito de la sesión
+                Carrito carrito = (Carrito) session.getAttribute("carrito");
+
                 // Verificar si el usuario no es nulo antes de acceder a sus atributos
                 if (usuario != null) {
                     // Utilizar los atributos del objeto Usuario
-                    String nombreUsuario = usuario.getUsername();
                     Usuario.RolUsuario rolUsuario = usuario.getTipodeusuario();
         %>
         <ul>
@@ -76,10 +79,13 @@
             <li><a href="<%= request.getContextPath()%>/MostrarJuegos">Consultar juegos</a></li>
             <li><a href="<%= request.getContextPath()%>/MostrarProductos">Consultar productos</a></li>
 
+            <%-- Enlace del carrito con la cantidad de productos --%>
+            <li><a href="mostrarCarrito.jsp">Carrito <%= (carrito != null && carrito.getCantidadTotal() > 0) ? "(" + carrito.getCantidadTotal() + ")" : ""%></a></li>
+
             <%-- Opciones específicas para Admin --%>
             <% if (rolUsuario == Usuario.RolUsuario.Administrador) { %>
             <li><a href="#">Panel de Administración</a></li>
-                <% } %>
+                <% }%>
 
             <li style="margin-left: auto;"><a href="<%= request.getContextPath()%>/CerrarSesion">Cerrar sesión</a></li>
         </ul>
@@ -87,12 +93,13 @@
             }
         } else {
             // Menú para Invitado
-        %>
+%>
         <ul>
             <li><a href="<%= request.getContextPath()%>/MostrarConsolas">Consultar consolas</a></li>
             <li><a href="<%= request.getContextPath()%>/MostrarJuegos">Consultar juegos</a></li>
             <li><a href="<%= request.getContextPath()%>/MostrarProductos">Consultar productos</a></li>
-            <li style="margin-left: auto;"><a href="#">Iniciar sesión</a></li>
+
+            <li><a href="login.jsp">Iniciar Sesión</a></li>
         </ul>
         <%
             }
@@ -100,4 +107,3 @@
 
     </body>
 </html>
-

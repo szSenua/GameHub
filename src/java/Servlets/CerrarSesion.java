@@ -40,8 +40,8 @@ public class CerrarSesion extends HttpServlet {
             session.invalidate();
         }
 
-        // Redirecciona al login
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        // Redirecciona al índice
+        response.sendRedirect(request.getContextPath() + "/index.jsp");
     
     }
 

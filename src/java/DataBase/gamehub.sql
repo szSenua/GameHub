@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 26-12-2023 a las 20:25:26
+-- Tiempo de generación: 28-12-2023 a las 19:15:42
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -106,8 +106,13 @@ CREATE TABLE `tickets` (
 --
 
 CREATE TABLE `ticket_items` (
+  `ticket_item_id` int(11) NOT NULL,
   `ticket_id` int(11) NOT NULL,
-  `item_id` int(11) NOT NULL
+  `tipo_producto` enum('Consola','Juego') NOT NULL,
+  `id_consola` int(11) DEFAULT NULL,
+  `id_juego` int(11) DEFAULT NULL,
+  `cantidad` int(11) DEFAULT NULL,
+  `precio_unitario` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -166,7 +171,10 @@ ALTER TABLE `tickets`
 -- Indices de la tabla `ticket_items`
 --
 ALTER TABLE `ticket_items`
-  ADD KEY `fk_ticket_items_tickets` (`ticket_id`);
+  ADD PRIMARY KEY (`ticket_item_id`),
+  ADD KEY `fk_ticket_items_tickets` (`ticket_id`),
+  ADD KEY `fk_ticket_items_producto_consola` (`id_consola`),
+  ADD KEY `fk_ticket_items_producto_juego` (`id_juego`);
 
 --
 -- Indices de la tabla `usuarios`
@@ -198,6 +206,12 @@ ALTER TABLE `tickets`
   MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `ticket_items`
+--
+ALTER TABLE `ticket_items`
+  MODIFY `ticket_item_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -224,7 +238,9 @@ ALTER TABLE `tickets`
 -- Filtros para la tabla `ticket_items`
 --
 ALTER TABLE `ticket_items`
-  ADD CONSTRAINT `fk_ticket_items_tickets` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`ticket_id`);
+  ADD CONSTRAINT `fk_ticket_items_producto_consola` FOREIGN KEY (`id_consola`) REFERENCES `consolas` (`id_consola`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ticket_items_producto_juego` FOREIGN KEY (`id_juego`) REFERENCES `juegos` (`id_juego`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ticket_items_tickets` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`ticket_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

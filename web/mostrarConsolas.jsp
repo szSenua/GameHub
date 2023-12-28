@@ -53,13 +53,19 @@
         <h2>Lista de Consolas</h2>
 
         <div class="card-container">
-            <%                ArrayList<Consola> listaConsolas = (ArrayList<Consola>) request.getAttribute("listaConsolas");
+            <%  
+                session = request.getSession();
+                Usuario usuario = (Usuario) session.getAttribute("usuario");
+                ArrayList<Consola> listaConsolas = (ArrayList<Consola>) request.getAttribute("listaConsolas");
 
                 if (listaConsolas != null) {
                     Iterator<Consola> iterator = listaConsolas.iterator();
 
                     while (iterator.hasNext()) {
                         Consola consola = iterator.next();
+
+                        String tipoProducto = "consola";
+                        String idProducto = "C" + consola.getId_consola();
             %>
             <div class="card">
                 <h3><%= consola.getNombre()%></h3>
@@ -69,9 +75,18 @@
                 <p>Potencia CPU: <%= consola.getPotencia_cpu()%></p>
                 <p>Potencia GPU: <%= consola.getPotencia_gpu()%></p>
                 <p>Unidades Disponibles <%= consola.getUnidadesDisponibles()%></p>
-                <form action="procesarCompra.jsp" method="post">
-                    <input type="hidden" name="idConsola" value="<%= consola.getId_consola()%>">
+                <form action="agregarAlCarro" method="post">
+                    <input type="hidden" name="tipoProducto" value="<%= tipoProducto%>" />
+                    <input type="hidden" name="idProducto" value="<%= idProducto%>" />
+                   <%
+                        if (usuario != null) {
+                            Usuario.RolUsuario rolUsuario = usuario.getTipodeusuario();
+
+                            if (usuario != null && (rolUsuario == Usuario.RolUsuario.Administrador
+                                    || rolUsuario == Usuario.RolUsuario.Usuario)) { %>
                     <input type="submit" class="comprar-button" name="comprar" value="Comprar">
+                    <% }
+                        }%>
                 </form>
             </div>
             <%
