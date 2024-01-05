@@ -103,39 +103,34 @@ public class ConsolaDAO {
      * @param consolaModificada
      * @return
      */
-    public boolean modificaConsola(int id, Consola consolaModificada) {
+    public boolean modificaConsola(Consola consola) {
         try {
             // Preparar la consulta SQL para la actualización
             String query = "UPDATE consolas SET nombre=?, potencia_cpu=?, potencia_gpu=?, compania=?, precio=?, unidades_disponibles=? "
-                    + "WHERE " + id + " = ?";
+                    + "WHERE id_consola=?";
 
             PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
 
             // Establecer los valores de los parámetros
-            preparedStatement.setString(1, consolaModificada.getNombre());
-            preparedStatement.setString(2, consolaModificada.getPotencia_cpu());
-            preparedStatement.setString(3, consolaModificada.getPotencia_cpu());
-            preparedStatement.setString(4, consolaModificada.getCompania_desarrolladora());
-            preparedStatement.setDouble(5, consolaModificada.getPrecio());
-            preparedStatement.setInt(6, consolaModificada.getUnidadesDisponibles());
-            preparedStatement.setInt(7, consolaModificada.getId_consola());
+            preparedStatement.setString(1, consola.getNombre());
+            preparedStatement.setString(2, consola.getPotencia_cpu());
+            preparedStatement.setString(3, consola.getPotencia_gpu());
+            preparedStatement.setString(4, consola.getCompania_desarrolladora());
+            preparedStatement.setDouble(5, consola.getPrecio());
+            preparedStatement.setInt(6, consola.getUnidadesDisponibles());
+            preparedStatement.setInt(7, consola.getId_consola());
 
             // Ejecutar la consulta de actualización
             int filasAfectadas = preparedStatement.executeUpdate();
 
             // Verificar si la actualización fue exitosa
-            if (filasAfectadas > 0) {
-                System.out.println("Consola modificada con éxito");
-                return true;
-            } else {
-                System.out.println("No se pudo modificar la consola");
-                return false;
-            }
+            return filasAfectadas > 0;
 
         } catch (SQLException ex) {
-            System.out.println("Error al modificar la consola: " + ex.getMessage());
+            System.out.println("Error al actualizar la consola: " + ex.getMessage());
             return false;
         }
+    
     }
 
     /**

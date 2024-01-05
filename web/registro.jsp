@@ -1,6 +1,6 @@
 <%-- 
-    Document   : login
-    Created on : 8 dic 2023, 20:23:57
+    Document   : registro
+    Created on : 4 ene 2024, 20:25:59
     Author     : SzBel
 --%>
 
@@ -9,11 +9,9 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        
-        <title>Login</title>
-        
-         <style>
-        body {
+        <title>Registro</title>
+        <style>
+            body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
@@ -61,24 +59,42 @@
             background-color: #45a049;
         }
         
-        #register-link {
+        .error-message {
+            color: red;
+            margin-bottom: 15px;
+        }
+        
+        #index-link {
                 margin-top: 15px;
                 display: block;
                 color: #333;
                 text-decoration: none;
          }
-    </style>
+        </style>
     </head>
     <body>
-        <form action="ValidarUsuario" method="post">
-            <label for="usuario">Usuario: </label>
-            <input type="text" name="usuario"><br>
-            <label for="password">Contraseña: </label>
-            <input type="password" name="password"><br>
-            <input type="submit" value="Enviar" name="enviar">
-             <a href="registro.jsp" id="register-link">¿No tienes una cuenta? Regístrate aquí.</a>
-        </form>
+    <form action="ValidaRegistro" method="post">
         
-       
-    </body>
+         <%-- Mostrar el mensaje de error si existe --%>
+        <%
+            String errorMessage = (String) request.getAttribute("errorMessage");
+            if (errorMessage != null && !errorMessage.isEmpty()) {
+        %>
+                <div class="error-message">
+                    <%= errorMessage %>
+                </div>
+        <%
+            }
+        %>
+        
+        <label for="username">Nombre de Usuario: </label>
+        <input type="text" name="username" required><br>
+        <label for="password">Contraseña: </label>
+        <input type="password" name="password" required><br>
+        <label for="saldo">Saldo: </label>
+        <input type="text" name="saldo" required><br>
+        <input type="submit" value="Registrarse" name="registrar"> 
+        <a href="index.jsp" id="index-link">Volver al Índice</a>
+    </form>
+</body>
 </html>

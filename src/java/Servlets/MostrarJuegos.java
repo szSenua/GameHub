@@ -10,7 +10,6 @@ import Entity.Juego;
 import Handlers.ConsolaDAO;
 import Handlers.JuegoDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,10 +40,7 @@ public class MostrarJuegos extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        
-        
-        
-        
+    
         // Conectar a la base de datos
         Conexion miConexion = new Conexion();
         miConexion.conectar();
@@ -53,13 +49,13 @@ public class MostrarJuegos extends HttpServlet {
 
         // Obtener las consolas seleccionadas
         String[] consolasSeleccionadas = request.getParameterValues("consolas");
-        
+
         if (request.getParameter("quitarFiltros") != null) {
-        // Si se presionó el botón, redirige a MostrarJuegos sin parámetros de consolas
-        response.sendRedirect(request.getContextPath() + "/MostrarJuegos");
-        return;
-    }
-        
+            // Si se presionó el botón, redirige a MostrarJuegos sin parámetros de consolas
+            response.sendRedirect(request.getContextPath() + "/MostrarJuegos");
+            return;
+        }
+
         // Colocar las consolas seleccionadas en el atributo de la solicitud
         request.setAttribute("consolasSeleccionadas", consolasSeleccionadas);
 
@@ -69,8 +65,8 @@ public class MostrarJuegos extends HttpServlet {
         if (consolasSeleccionadas != null) {
             // Convertir los strings a enteros
             List<Integer> idConsolas = Arrays.stream(consolasSeleccionadas)
-                                              .map(Integer::parseInt)
-                                              .collect(Collectors.toList());
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
 
             listaConsolas = consolaDAO.obtenerConsolas();
             // Llamar al método obtenerJuegosPorConsolas con la lista de IDs de consolas
@@ -85,12 +81,19 @@ public class MostrarJuegos extends HttpServlet {
         request.setAttribute("listaJuegos", listaJuegos);
         request.setAttribute("listaConsolas", listaConsolas);
 
+        // Establece las consolas asociadas a cada juego
+        if (listaJuegos != null) {
+            for (Juego juego : listaJuegos) {
+                ArrayList<Consola> consolasPorJuego = juegoDAO.obtenerConsolasPorJuego(juego.getId_juego());
+                request.setAttribute("consolasPorJuego_" + juego.getId_juego(), consolasPorJuego);
+            }
+        }
+
         // Cerrar la conexión
         miConexion.desconectar();
 
         // Redirigir a la página que mostrará la lista de juegos
         request.getRequestDispatcher("/mostrarJuegos.jsp").forward(request, response);
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

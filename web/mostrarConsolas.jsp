@@ -4,6 +4,7 @@
     Author     : SzBel
 --%>
 
+<%@page import="java.util.Collections"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="Entity.Consola"%>
 <%@page import="java.util.ArrayList"%>
@@ -13,7 +14,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Lista de Consolas</title>
+        <title>Mostrar Consolas</title>
         <style>
             .card-container {
                 display: flex;
@@ -50,7 +51,7 @@
         </style>
     </head>
     <body>
-        <h2>Lista de Consolas</h2>
+       
 
         <div class="card-container">
             <%  
@@ -58,6 +59,9 @@
                 Usuario usuario = (Usuario) session.getAttribute("usuario");
                 ArrayList<Consola> listaConsolas = (ArrayList<Consola>) request.getAttribute("listaConsolas");
 
+                // Ordenar la lista de juegos alfabéticamente por el nombre
+                        Collections.sort(listaConsolas, ( c1,   c2) -> c1.getNombre().compareTo(c2.getNombre()));
+                
                 if (listaConsolas != null) {
                     Iterator<Consola> iterator = listaConsolas.iterator();
 
@@ -75,7 +79,7 @@
                 <p>Potencia CPU: <%= consola.getPotencia_cpu()%></p>
                 <p>Potencia GPU: <%= consola.getPotencia_gpu()%></p>
                 <p>Unidades Disponibles <%= consola.getUnidadesDisponibles()%></p>
-                <form action="agregarAlCarro" method="post">
+                <form action="AgregarAlCarro" method="post">
                     <input type="hidden" name="tipoProducto" value="<%= tipoProducto%>" />
                     <input type="hidden" name="idProducto" value="<%= idProducto%>" />
                    <%

@@ -47,15 +47,23 @@
 <body>
     <h2>Productos en el Carrito</h2>
 
-    <% 
-        session = request.getSession();
-        Carrito carrito = (Carrito) session.getAttribute("carrito");
+    <%
+        // Verificar si hay una sesión activa
+        session = request.getSession(false);
 
-        if (carrito != null) {
-            List<ItemCarritoConsola> consolas = carrito.getConsolas();
-            List<ItemCarritoJuego> juegos = carrito.getJuegos();
+        if (session == null || session.getAttribute("usuario") == null) {
+            // No hay sesión activa o no se ha autenticado, redirigir a la página de login
+            response.sendRedirect("login.jsp");
+        } else {
+            // El usuario está autenticado, continuar con el contenido de la página
 
-            if (!consolas.isEmpty() || !juegos.isEmpty()) {
+            Carrito carrito = (Carrito) session.getAttribute("carrito");
+
+            if (carrito != null) {
+                List<ItemCarritoConsola> consolas = carrito.getConsolas();
+                List<ItemCarritoJuego> juegos = carrito.getJuegos();
+
+                if (!consolas.isEmpty() || !juegos.isEmpty()) {
     %>
                 <form action="GestionarCarrito" method="post">
                     <table>
@@ -133,6 +141,7 @@
             <p>El carrito está vacío.</p>
     <%
         }
+}
     %>
 </body>
 </html>

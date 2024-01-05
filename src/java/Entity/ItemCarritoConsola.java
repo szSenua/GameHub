@@ -34,6 +34,10 @@ public class ItemCarritoConsola {
         return consola.getId_consola() == item.consola.getId_consola();
     }
 
+    /**
+     * Calcula que dos instancias de la misma clase (por el valor de sus ids) tengan el mismo valor hash
+     * @return 
+     */
     @Override
     public int hashCode() {
         return Objects.hash(consola.getId_consola());

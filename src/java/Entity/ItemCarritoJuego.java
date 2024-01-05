@@ -30,7 +30,7 @@ public class ItemCarritoJuego {
     
     
     /**
-     * Función que sobreescritura el método equals
+     * Función de sobreescritura el método equals
      * @param objeto
      * @return 
      */

@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * @author SzBel
  */
 public class CarritoDAO {
-    
+
     public static int ticket;
 
     private Carrito carrito;
@@ -29,43 +29,120 @@ public class CarritoDAO {
         this.miConexion = miConexion;
     }
 
-public boolean procesarCompra(int idUsuario, Carrito carrito) {
-    Connection connection = miConexion.getMiConexion();
+    /**
+     * Función que gestiona la compra
+     * @param idUsuario
+     * @param carrito
+     * @return 
+     */
+    public boolean procesarCompra(int idUsuario, Carrito carrito) {
+        Connection connection = miConexion.getMiConexion();
 
-    try {
-        // Crear un nuevo ticket
-        int idTicket = insertarNuevoTicket(idUsuario);
+        try {
+            // Verificar existencias y saldo antes de procesar la compra
+            if (!verificarExistencias(carrito) || !verificarSaldoUsuario(idUsuario, carrito)) {
+                return false; // La compra no se puede procesar debido a falta de existencias o saldo insuficiente
+            }
 
-        // Asociar elementos del carrito al ticket y actualizar stock
+            // Crear un nuevo ticket
+            int idTicket = insertarNuevoTicket(idUsuario);
+
+            // Asociar elementos del carrito al ticket y actualizar stock
+            for (ItemCarritoConsola item : carrito.getConsolas()) {
+                insertarItemTicket(idTicket, item);
+                actualizarStockConsola(item.getConsola().getId_consola(), item.getCantidad());
+            }
+
+            for (ItemCarritoJuego item : carrito.getJuegos()) {
+                insertarItemTicket(idTicket, item);
+                actualizarStockJuego(item.getJuego().getId_juego(), item.getCantidad());
+            }
+
+            // Actualizar saldo del usuario
+            double totalCompra = carrito.calcularTotal();
+            actualizarSaldoUsuario(idUsuario, totalCompra);
+
+            // Guardo el id del ticket en una variable estática
+            ticket = idTicket;
+
+            // Vaciar el carrito
+            carrito.vaciarCarrito();
+
+            return true; // La compra se procesó con éxito
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+            return false; // La compra no se procesó con éxito
+        }
+    }
+
+    private boolean verificarSaldoUsuario(int idUsuario, Carrito carrito) throws SQLException {
+        double saldoUsuario = obtenerSaldoUsuario(idUsuario);
+        double totalCompra = carrito.calcularTotal();
+
+        return saldoUsuario >= totalCompra;
+    }
+
+    private double obtenerSaldoUsuario(int idUsuario) throws SQLException {
+        String sql = "SELECT saldo FROM usuarios WHERE id_usuario = ?";
+        try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
+            preparedStatement.setInt(1, idUsuario);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble("saldo");
+            }
+
+            return 0; // Si no se encuentra el usuario, se asume saldo cero
+        }
+    }
+
+    private boolean verificarExistencias(Carrito carrito) throws SQLException {
         for (ItemCarritoConsola item : carrito.getConsolas()) {
-            insertarItemTicket(idTicket, item);
-            actualizarStockConsola(item.getConsola().getId_consola(), item.getCantidad());
+            if (!verificarExistenciasConsola(item.getConsola().getId_consola(), item.getCantidad())) {
+                return false; // No hay suficientes existencias de la consola
+            }
         }
 
         for (ItemCarritoJuego item : carrito.getJuegos()) {
-            insertarItemTicket(idTicket, item);
-            actualizarStockJuego(item.getJuego().getId_juego(), item.getCantidad());
+            if (!verificarExistenciasJuego(item.getJuego().getId_juego(), item.getCantidad())) {
+                return false; // No hay suficientes existencias del juego
+            }
         }
 
-        // Actualizar saldo del usuario
-        double totalCompra = carrito.calcularTotal();
-        actualizarSaldoUsuario(idUsuario, totalCompra);
-
-        //Guardo el id del ticket en una variable estática
-        ticket = idTicket;
-
-        // Vaciar el carrito
-        carrito.vaciarCarrito();
-
-        return true; // La compra se procesó con éxito
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-
-        return false; // La compra no se procesó con éxito
+        return true; // Hay suficientes existencias de todos los productos en el carrito
     }
-}
 
+    private boolean verificarExistenciasConsola(int idConsola, int cantidad) throws SQLException {
+        String sql = "SELECT unidades_disponibles FROM consolas WHERE id_consola = ?";
+        try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
+            preparedStatement.setInt(1, idConsola);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()) {
+                int existencias = rs.getInt("unidades_disponibles");
+                return existencias >= cantidad;
+            }
+
+            return false;
+        }
+    }
+
+    private boolean verificarExistenciasJuego(int idJuego, int cantidad) throws SQLException {
+        String sql = "SELECT unidades_disponibles FROM juegos WHERE id_juego = ?";
+        try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
+            preparedStatement.setInt(1, idJuego);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()) {
+                int existencias = rs.getInt("unidades_disponibles");
+                return existencias >= cantidad;
+            }
+
+            return false;
+        }
+    }
 
     public int insertarNuevoTicket(int idUsuario) throws SQLException {
         String sql = "INSERT INTO tickets (id_usuario) VALUES (?)";
@@ -141,104 +218,101 @@ public boolean procesarCompra(int idUsuario, Carrito carrito) {
         }
     }
 
-public ArrayList<ItemCarritoConsola> obtenerConsolasPorTicket(int idTicket) {
-    ArrayList<ItemCarritoConsola> consolas = new ArrayList<>();
+    public ArrayList<ItemCarritoConsola> obtenerConsolasPorTicket(int idTicket) {
+        ArrayList<ItemCarritoConsola> consolas = new ArrayList<>();
 
-    String sql = "SELECT * FROM ticket_items WHERE ticket_id = ? AND tipo_producto = 'Consola'";
+        String sql = "SELECT * FROM ticket_items WHERE ticket_id = ? AND tipo_producto = 'Consola'";
 
-    try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
-        preparedStatement.setInt(1, idTicket);
-        ResultSet rs = preparedStatement.executeQuery();
+        try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
+            preparedStatement.setInt(1, idTicket);
+            ResultSet rs = preparedStatement.executeQuery();
 
-        while (rs.next()) {
-            int idConsola = rs.getInt("id_consola");
-            int cantidad = rs.getInt("cantidad");
+            while (rs.next()) {
+                int idConsola = rs.getInt("id_consola");
+                int cantidad = rs.getInt("cantidad");
 
-            // Obtener más detalles de la consola si es necesario
-            Consola consola = obtenerDetallesConsola(idConsola);
+                // Obtener más detalles de la consola si es necesario
+                Consola consola = obtenerDetallesConsola(idConsola);
 
-            ItemCarritoConsola item = new ItemCarritoConsola(consola, cantidad);
-            consolas.add(item);
+                ItemCarritoConsola item = new ItemCarritoConsola(consola, cantidad);
+                consolas.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+
+        return consolas;
     }
 
-    return consolas;
-}
+    public ArrayList<ItemCarritoJuego> obtenerJuegosPorTicket(int idTicket) {
+        ArrayList<ItemCarritoJuego> juegos = new ArrayList<>();
 
-public ArrayList<ItemCarritoJuego> obtenerJuegosPorTicket(int idTicket) {
-    ArrayList<ItemCarritoJuego> juegos = new ArrayList<>();
+        String sql = "SELECT * FROM ticket_items WHERE ticket_id = ? AND tipo_producto = 'Juego'";
 
-    String sql = "SELECT * FROM ticket_items WHERE ticket_id = ? AND tipo_producto = 'Juego'";
+        try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
+            preparedStatement.setInt(1, idTicket);
+            ResultSet rs = preparedStatement.executeQuery();
 
-    try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
-        preparedStatement.setInt(1, idTicket);
-        ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                int idJuego = rs.getInt("id_juego");
+                int cantidad = rs.getInt("cantidad");
 
-        while (rs.next()) {
-            int idJuego = rs.getInt("id_juego");
-            int cantidad = rs.getInt("cantidad");
+                // Obtener más detalles del juego si es necesario
+                Juego juego = obtenerDetallesJuego(idJuego);
 
-            // Obtener más detalles del juego si es necesario
-            Juego juego = obtenerDetallesJuego(idJuego);
-
-            ItemCarritoJuego item = new ItemCarritoJuego(juego, cantidad);
-            juegos.add(item);
+                ItemCarritoJuego item = new ItemCarritoJuego(juego, cantidad);
+                juegos.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+
+        return juegos;
     }
 
-    return juegos;
-}
-
-    
-    
     public Consola obtenerDetallesConsola(int idConsola) throws SQLException {
-    String sql = "SELECT * FROM consolas WHERE id_consola = ?";
-    try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
-        preparedStatement.setInt(1, idConsola);
+        String sql = "SELECT * FROM consolas WHERE id_consola = ?";
+        try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
+            preparedStatement.setInt(1, idConsola);
 
-        try (ResultSet rs = preparedStatement.executeQuery()) {
-            if (rs.next()) {
-                // Aquí creas una instancia de Consola con los detalles del ResultSet
-                String nombre = rs.getString("nombre");
-                String potenciaCpu = rs.getString("potencia_cpu");
-                String potenciaGpu = rs.getString("potencia_gpu");
-                String compania = rs.getString("compania");
-                double precio = rs.getDouble("precio");
-                int unidadesDisponibles = rs.getInt("unidades_disponibles");
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    // Aquí creo una instancia de Consola con los detalles del ResultSet
+                    String nombre = rs.getString("nombre");
+                    String potenciaCpu = rs.getString("potencia_cpu");
+                    String potenciaGpu = rs.getString("potencia_gpu");
+                    String compania = rs.getString("compania");
+                    double precio = rs.getDouble("precio");
+                    int unidadesDisponibles = rs.getInt("unidades_disponibles");
 
-                return new Consola(idConsola, nombre, potenciaCpu, potenciaGpu, compania, precio, unidadesDisponibles);
+                    return new Consola(idConsola, nombre, potenciaCpu, potenciaGpu, compania, precio, unidadesDisponibles);
+                }
             }
         }
+
+        return null; // Retorna null si no se encuentra la consola
     }
 
-    return null; // Retorna null si no se encuentra la consola
-}
+    public Juego obtenerDetallesJuego(int idJuego) throws SQLException {
+        String sql = "SELECT * FROM juegos WHERE id_juego = ?";
+        try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
+            preparedStatement.setInt(1, idJuego);
 
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    // Aquí creo una instancia de Juego con los detalles del ResultSet
+                    String nombre = rs.getString("nombre");
+                    String companiaDesarrolladora = rs.getString("compania_desarrolladora");
+                    String genero = rs.getString("genero");
+                    int puntuacionMetacritic = rs.getInt("puntuacion_metacritic");
+                    double precio = rs.getDouble("precio");
+                    int unidadesDisponibles = rs.getInt("unidades_disponibles");
 
-public Juego obtenerDetallesJuego(int idJuego) throws SQLException {
-    String sql = "SELECT * FROM juegos WHERE id_juego = ?";
-    try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(sql)) {
-        preparedStatement.setInt(1, idJuego);
-
-        try (ResultSet rs = preparedStatement.executeQuery()) {
-            if (rs.next()) {
-                // Aquí creas una instancia de Juego con los detalles del ResultSet
-                String nombre = rs.getString("nombre");
-                String companiaDesarrolladora = rs.getString("compania_desarrolladora");
-                String genero = rs.getString("genero");
-                int puntuacionMetacritic = rs.getInt("puntuacion_metacritic");
-                double precio = rs.getDouble("precio");
-                int unidadesDisponibles = rs.getInt("unidades_disponibles");
-
-                return new Juego(idJuego, nombre, companiaDesarrolladora, genero, puntuacionMetacritic, precio, unidadesDisponibles);
+                    return new Juego(idJuego, nombre, companiaDesarrolladora, genero, puntuacionMetacritic, precio, unidadesDisponibles);
+                }
             }
         }
-    }
 
-    return null; // Retorna null si no se encuentra el juego
-}
+        return null; // Retorna null si no se encuentra el juego
+    }
 }

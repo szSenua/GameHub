@@ -5,6 +5,7 @@
 package Handlers;
 
 import Conexion.Conexion;
+import Entity.Consola;
 import Entity.Juego;
 import Entity.Producto;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class JuegoDAO {
      */
     public ArrayList<Juego> obtenerJuegos() {
         try {
-            String query = "SELECT * FROM juegos ORDER BY juegos.nombre";
+            String query = "SELECT * FROM juegos";
             PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -56,6 +57,42 @@ public class JuegoDAO {
         } 
 
         return listaJuegos;
+    }
+    
+    
+    public Juego obtenerJuegoPorId(int idJuego) {
+        try {
+            // Preparar la consulta SQL para la obtención del juego por ID
+            String query = "SELECT * FROM juegos WHERE id_juego=?";
+            PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
+
+            // Establecer el valor del parámetro
+            preparedStatement.setInt(1, idJuego);
+
+            // Ejecutar la consulta de selección
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Verificar si se encontró el juego
+            if (resultSet.next()) {
+                String nombre = resultSet.getString("nombre");
+                String genero = resultSet.getString("genero");
+                int puntuacion = resultSet.getInt("puntuacion_metacritic");
+                String compania = resultSet.getString("compania_desarrolladora");
+                double precio = resultSet.getDouble("precio");
+                int unidadesDisponibles = resultSet.getInt("unidades_disponibles");
+
+                Juego juego = new Juego(idJuego, nombre, compania, genero, puntuacion,
+                        precio, unidadesDisponibles);
+
+                return juego;
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Error al obtener la consola por ID: " + ex.getMessage());
+        }
+
+        // Si no se encuentra ninguna consola con el ID proporcionado, devolver null
+        return null;
     }
 
     /**
@@ -104,11 +141,11 @@ public class JuegoDAO {
      * @param juegoModificado
      * @return
      */
-    public boolean modificaJuego(int id, Juego juegoModificado) {
+    public boolean modificaJuego(Juego juegoModificado) {
         try {
             // Preparar la consulta SQL para la actualización
             String query = "UPDATE juegos SET nombre=?, compania_desarrolladora=?, genero=?, puntuacion_metacritic=?, precio=?, unidades_disponibles=? "
-                    + "WHERE " + id + " = ?";
+                    + "WHERE id_juego = ?";
 
             PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
 
@@ -218,5 +255,42 @@ public class JuegoDAO {
 
     return juegosPorConsolas;
 }
+    
+    /**
+     * Función que obtiene la relación de consolas para un juego
+     * @param idJuego
+     * @return 
+     */
+    public ArrayList<Consola> obtenerConsolasPorJuego(int idJuego) {
+    ArrayList<Consola> consolasPorJuego = new ArrayList<>();
+    try {
+        String query = "SELECT consolas.* FROM consolas "
+                + "INNER JOIN juegos_plataformas ON consolas.id_consola = juegos_plataformas.id_consola "
+                + "WHERE juegos_plataformas.id_juego = ?";
+        PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
+        preparedStatement.setInt(1, idJuego);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()) {
+            // Crea objetos Consola y agrégalos a la lista
+            int idConsola = resultSet.getInt("id_consola");
+            String nombre = resultSet.getString("nombre");
+            String potenciaCPU = resultSet.getString("potencia_cpu");
+            String potenciaGPU = resultSet.getString("potencia_gpu");
+            String compania = resultSet.getString("compania");
+            double precio = resultSet.getDouble("precio");
+            int unidadesDisponibles = resultSet.getInt("unidades_disponibles");
+
+            Consola consola = new Consola(idConsola, nombre, potenciaCPU, potenciaGPU, compania,
+                    precio, unidadesDisponibles);
+
+            consolasPorJuego.add(consola);
+        }
+    } catch (SQLException ex) {
+        System.out.println("Error al obtener consolas por juego: " + ex.getMessage());
+    }
+    return consolasPorJuego;
+}
+
 
 }

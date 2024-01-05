@@ -10,5 +10,7 @@
             <max-age>43200</max-age> <!-- 43200 seconds = 12 hours -->
         </cookie-config>
     </session-config>
+    
+
 
 </web-app>

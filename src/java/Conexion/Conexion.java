@@ -27,6 +27,10 @@ public class Conexion {
         this.url = "jdbc:mysql://localhost:3306/gamehub";
 
     }
+    
+    /**
+     * Función que conecta con la base de datos
+     */
 
     public void conectar() {
 
@@ -48,6 +52,9 @@ public class Conexion {
 
     }
 
+    /**
+     * Función que desconecta de la base de datos
+     */
     public void desconectar() {
 
         try {

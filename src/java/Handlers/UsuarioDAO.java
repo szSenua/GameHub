@@ -5,9 +5,6 @@
 package Handlers;
 
 import Conexion.Conexion;
-import Entity.Consola;
-import Entity.Juego;
-import Entity.Producto;
 import Entity.Usuario;
 import java.util.ArrayList;
 import java.sql.*;
@@ -59,62 +56,119 @@ public class UsuarioDAO {
 
         } catch (SQLException ex) {
             System.out.println("Error al obtener todos los usuarios: " + ex.getMessage());
-        } finally {
-            miConexion.desconectar();
-        }
+        } 
 
         return listaUsuarios;
     }
+    
+    public boolean existeUsuario(String username) {
+    try {
+        String query = "SELECT COUNT(*) FROM usuarios WHERE username = ?";
+        PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
+        preparedStatement.setString(1, username);
 
-    //Función provisional
-    public boolean comprarProducto(Usuario usuario, Producto producto, int cantidad) {
+        ResultSet resultSet = preparedStatement.executeQuery();
+        resultSet.next();
+        int count = resultSet.getInt(1);
+
+        return count > 0;
+    } catch (SQLException ex) {
+        System.out.println("Error al verificar la existencia del usuario: " + ex.getMessage());
+        return false;
+    }
+}
+
+
+    public boolean insertarUsuario(Usuario usuario) {
         try {
+            String query = "INSERT INTO usuarios (username, password, tipodeusuario, saldo) VALUES (?, ?, ?, ?)";
+            PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
 
-            // Verificar si hay suficiente stock
-            if (producto.getUnidadesDisponibles() < cantidad) {
-                System.out.println("No hay suficiente stock para realizar la compra.");
-                return false;
-            }
+            preparedStatement.setString(1, usuario.getUsername());
+            preparedStatement.setString(2, usuario.getPassword());
+            preparedStatement.setString(3, usuario.getTipodeusuario().name());
+            preparedStatement.setDouble(4, usuario.getSaldo());
 
-            // Verificar si el usuario tiene saldo suficiente
-            double costoTotal = producto.getPrecio() * cantidad;
-            if (usuario.getSaldo() < costoTotal) {
-                System.out.println("Saldo insuficiente para realizar la compra.");
-                return false;
-            }
-
-            // Actualizar el saldo del usuario y el stock del producto en una transacción
-            String compraQuery = "";
-
-            if (producto instanceof Consola) {
-                compraQuery = "UPDATE usuarios SET saldo = saldo - ? WHERE id_usuario = ?;"
-                        + "UPDATE consolas SET unidades_disponibles = unidades_disponibles - ? WHERE id_consola = ?";
-            } else if (producto instanceof Juego) {
-                compraQuery = "UPDATE usuarios SET saldo = saldo - ? WHERE id_usuario = ?;"
-                        + "UPDATE juegos SET unidades_disponibles = unidades_disponibles - ? WHERE id_juego = ?";
-            }
-
-            try (PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(compraQuery)) {
-                preparedStatement.setDouble(1, costoTotal);
-                preparedStatement.setInt(2, usuario.getId_usuario());
-                preparedStatement.setInt(3, cantidad);
-
-                // Acceder al atributo id directamente
-                int idProducto = (producto instanceof Consola) ? ((Consola) producto).getId_consola() : ((Juego) producto).getId_juego();
-                preparedStatement.setInt(4, idProducto);
-
-                // Ejecutar la transacción
-                preparedStatement.executeUpdate();
-
-                System.out.println("Compra realizada con éxito.");
-                return true;
-            }
+            int filasAfectadas = preparedStatement.executeUpdate();
+            return filasAfectadas > 0;
         } catch (SQLException ex) {
-            System.out.println("Error al realizar la compra: " + ex.getMessage());
+            System.out.println("Error al insertar el usuario: " + ex.getMessage());
             return false;
-        } finally {
-            miConexion.desconectar();
         }
     }
+
+    public Usuario obtenerUsuarioPorId(int idUsuario) {
+        try {
+            String query = "SELECT * FROM usuarios WHERE id_usuario = ?";
+            PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
+            preparedStatement.setInt(1, idUsuario);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String username = resultSet.getString("username");
+                String password = resultSet.getString("password");
+                String tipoUsuarioString = resultSet.getString("tipodeusuario");
+                Usuario.RolUsuario tipodeusuario = Usuario.RolUsuario.valueOf(tipoUsuarioString);
+                double saldo = resultSet.getDouble("saldo");
+
+                return new Usuario(idUsuario, username, password, tipodeusuario, saldo);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error al obtener el usuario por ID: " + ex.getMessage());
+        }
+
+        return null;
+    }
+
+    public boolean actualizarUsuario(Usuario usuario) {
+        try {
+            String query = "UPDATE usuarios SET username = ?, password = ?, tipodeusuario = ?, saldo = ? WHERE id_usuario = ?";
+            PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
+
+            preparedStatement.setString(1, usuario.getUsername());
+            preparedStatement.setString(2, usuario.getPassword());
+            preparedStatement.setString(3, usuario.getTipodeusuario().name());
+            preparedStatement.setDouble(4, usuario.getSaldo());
+            preparedStatement.setInt(5, usuario.getId_usuario());
+
+            int filasAfectadas = preparedStatement.executeUpdate();
+            return filasAfectadas > 0;
+        } catch (SQLException ex) {
+            System.out.println("Error al actualizar el usuario: " + ex.getMessage());
+            return false;
+        }
+    }
+
+    public boolean eliminarUsuario(int idUsuario) {
+        try {
+            String query = "DELETE FROM usuarios WHERE id_usuario = ?";
+            PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
+            preparedStatement.setInt(1, idUsuario);
+
+            int filasAfectadas = preparedStatement.executeUpdate();
+            return filasAfectadas > 0;
+        } catch (SQLException ex) {
+            System.out.println("Error al eliminar el usuario: " + ex.getMessage());
+            return false;
+        }
+    }
+    
+    public boolean actualizarSaldo(int idUsuario, double nuevoSaldo) {
+    try {
+        String query = "UPDATE usuarios SET saldo = ? WHERE id_usuario = ?";
+        PreparedStatement preparedStatement = miConexion.getMiConexion().prepareStatement(query);
+
+        preparedStatement.setDouble(1, nuevoSaldo);
+        preparedStatement.setInt(2, idUsuario);
+
+        int filasAfectadas = preparedStatement.executeUpdate();
+        return filasAfectadas > 0;
+    } catch (SQLException ex) {
+        System.out.println("Error al actualizar el saldo del usuario: " + ex.getMessage());
+        return false;
+    }
+}
+
 
 }

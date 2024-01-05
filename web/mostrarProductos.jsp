@@ -16,41 +16,46 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Mostrar Productos</title>
         <style>
-            .card-container {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        
+    }
 
-            .card {
-                border: 1px solid #ddd;
-                padding: 10px;
-                margin: 10px;
-                width: 300px;
-                display: inline-block;
-                vertical-align: top;
-                text-align: center;
-            }
+    .card {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px;
+        width: 300px;
+        display: flex; 
+        flex-direction: column;
+        align-items: center; 
+        text-align: center;
+        justify-content: center;
+    }
 
-            .card h3, .card p {
-                margin-bottom: 10px;
-            }
-            .comprar-button {
-                background-color: #4CAF50;
-                color: white;
-                padding: 10px;
-                border: none;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                cursor: pointer;
-                border-radius: 5px;
-            }
-        </style>
+    .card h3, .card p {
+        margin-bottom: 10px;
+    }
+
+    .comprar-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        border: none;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+</style>
+
     </head>
     <body>
         <div class="card-container">
@@ -96,12 +101,14 @@
                 <p>Potencia CPU: <%= ((Consola) producto).getPotencia_cpu()%></p>
                 <p>Potencia GPU: <%= ((Consola) producto).getPotencia_gpu()%></p>
                 <p>Compañía: <%= ((Consola) producto).getCompania_desarrolladora()%></p>
+                <p>Unidades Disponibles <%= ((Consola) producto).getUnidadesDisponibles() %></p>
                 <% } else if (producto instanceof Juego) {%>
                 <p>ID: <%= ((Juego) producto).getId_juego()%></p>
                 <p>Género: <%= ((Juego) producto).getGenero()%></p>
                 <p>Puntuación Metacritic: <%= ((Juego) producto).getPuntuacion_metacritic()%></p>
+                <p>Unidades Disponibles: <%= ((Juego) producto).getUnidadesDisponibles() %></p>
                 <% }%>
-                <form action="agregarAlCarro" method="post">
+                <form action="AgregarAlCarro" method="post">
                     <!-- Utiliza las variables intermedias -->
                     <input type="hidden" name="tipoProducto" value="<%= tipoProducto%>" />
                     <input type="hidden" name="idProducto" value="<%= idProducto%>" />

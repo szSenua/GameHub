@@ -30,6 +30,10 @@ public class Carrito {
         return juegos;
     }
     
+    /**
+     * Función que obtiene la cantidad total de productos en el carrito
+     * @return 
+     */
     public int getCantidadTotal() {
         int cantidadTotal = 0;
 

@@ -93,8 +93,6 @@ public class GestionarCarrito extends HttpServlet {
             // Procesar la compra y verificar si fue exitosa
             boolean compraExitosa = carritoDAO.procesarCompra(idUsuario, carrito);
 
-            
-
             if (compraExitosa) {
                 int idTicket = CarritoDAO.ticket;
                 // La compra se procesó con éxito

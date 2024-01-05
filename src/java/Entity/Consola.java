@@ -15,10 +15,20 @@ public class Consola extends Producto {
     private String potencia_gpu;
     private String compania_desarrolladora;
 
-    public Consola(int id_consola, String nombre, String potencia_cpu, String potencia_gpu, String compania_desarrolladora,
-            double precio, int unidadesDisponibles) {
+    public Consola(int id_consola, String nombre, String potencia_cpu, String potencia_gpu, 
+            String compania_desarrolladora, double precio, int unidadesDisponibles) {
         super(nombre, precio, unidadesDisponibles);
 
+        this.id_consola = id_consola;
+        this.potencia_cpu = potencia_cpu;
+        this.potencia_gpu = potencia_gpu;
+        this.compania_desarrolladora = compania_desarrolladora;
+        this.setTipoDeProducto("Consola");
+
+    }
+    
+    public Consola() {
+        super();
         this.id_consola = id_consola;
         this.potencia_cpu = potencia_cpu;
         this.potencia_gpu = potencia_gpu;

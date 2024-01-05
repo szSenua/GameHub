@@ -5,11 +5,10 @@
 package Servlets;
 
 import Conexion.Conexion;
-import Entity.Producto;
-import Handlers.ProductoDAO;
+import Entity.Usuario;
+import Handlers.UsuarioDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,8 +19,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author SzBel
  */
-@WebServlet(name = "MostrarProductos", urlPatterns = {"/MostrarProductos"})
-public class MostrarProductos extends HttpServlet {
+@WebServlet(name = "ValidaRegistro", urlPatterns = {"/ValidaRegistro"})
+public class ValidaRegistro extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,24 +34,53 @@ public class MostrarProductos extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String saldoStr = request.getParameter("saldo");
+
+        // Validar que el saldo sea un número
+        double saldo = 0;
+        try {
+            saldo = Double.parseDouble(saldoStr);
+        } catch (NumberFormatException e) {
+            // Setear el mensaje de error en el request
+            request.setAttribute("errorMessage", "Error: El saldo debe ser un número válido.");
+            // Redirigir de vuelta al formulario de registro
+            request.getRequestDispatcher("/registro.jsp").forward(request, response);
+            return;
+        }
+
+        // Crear una nueva instancia de Usuario con los datos proporcionados
+        Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setUsername(username);
+        nuevoUsuario.setPassword(password);
+        nuevoUsuario.setSaldo(saldo);
+        nuevoUsuario.setTipodeusuario(Usuario.RolUsuario.Usuario);
+
+        //Verificar si el usuario ya existe
         Conexion miConexion = new Conexion();
         miConexion.conectar();
-        ProductoDAO productodao = new ProductoDAO(miConexion);
-        
-        //Obtener la lista de Productos
-        ArrayList<Producto> listaProductos = productodao.obtenerProductos();
-        
-        // Colocar la lista en el atributo de la solicitud para mostrarla en el JSP
-        request.setAttribute("listaProductos", listaProductos);
-        
-        // Cerrar la conexión
-        miConexion.desconectar();
+        UsuarioDAO usuarioDAO = new UsuarioDAO(miConexion);
 
-        // Redirigir a la página que mostrará la lista de juegos
-        request.getRequestDispatcher("/mostrarProductos.jsp").forward(request, response);
-        
-        
+        if (usuarioDAO.existeUsuario(username)) {
+            // Setear el mensaje de error en el request
+            request.setAttribute("errorMessage", "Error: El nombre de usuario ya existe. Por favor, elige otro.");
+            // Redirigir de vuelta al formulario de registro
+            request.getRequestDispatcher("/registro.jsp").forward(request, response);
+        } else {
+            // Insertar el nuevo usuario en la base de datos
+            boolean insercionExitosa = usuarioDAO.insertarUsuario(nuevoUsuario);
+
+            if (insercionExitosa) {
+                // Redirigir al login
+                response.sendRedirect("login.jsp");
+            } else {
+                // Setear el mensaje de error en el request
+                request.setAttribute("errorMessage", "Error al registrar el usuario. Por favor, intenta nuevamente.");
+                // Redirigir de vuelta al formulario de registro
+                request.getRequestDispatcher("/registro.jsp").forward(request, response);
+            }
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

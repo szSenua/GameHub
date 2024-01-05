@@ -12,7 +12,7 @@
     <head>
         <title>Header</title>
         <style>
-               * {
+            * {
                 padding: 0;
                 margin: 0;
                 box-sizing: border-box;
@@ -20,6 +20,8 @@
 
             body {
                 font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
             }
 
             h1 {
@@ -35,6 +37,10 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                width: 100%;
             }
 
             li {
@@ -84,7 +90,7 @@
 
             <%-- Opciones específicas para Admin --%>
             <% if (rolUsuario == Usuario.RolUsuario.Administrador) { %>
-            <li><a href="#">Panel de Administración</a></li>
+            <li><a href="administracion.jsp">Panel de Administración</a></li>
                 <% }%>
 
             <li style="margin-left: auto;"><a href="<%= request.getContextPath()%>/CerrarSesion">Cerrar sesión</a></li>
@@ -93,7 +99,7 @@
             }
         } else {
             // Menú para Invitado
-%>
+        %>
         <ul>
             <li><a href="<%= request.getContextPath()%>/MostrarConsolas">Consultar consolas</a></li>
             <li><a href="<%= request.getContextPath()%>/MostrarJuegos">Consultar juegos</a></li>

@@ -88,13 +88,13 @@ public class ProductoDAO {
         // Realizar la modificación según el tipo de producto
         if (productoExistente instanceof Consola && nuevoProducto instanceof Consola) {
             // Modificar Consola
-            consolaDAO.modificaConsola(((Consola) productoExistente).getId_consola(), (Consola) nuevoProducto);
+            consolaDAO.modificaConsola((Consola) nuevoProducto);
             return true;
         }
 
         if (productoExistente instanceof Juego && nuevoProducto instanceof Juego) {
             // Modificar Juego
-            juegoDAO.modificaJuego(((Juego) productoExistente).getId_juego(), (Juego) nuevoProducto);
+            juegoDAO.modificaJuego((Juego) nuevoProducto);
             return true;
         }
 

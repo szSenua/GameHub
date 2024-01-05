@@ -1,3 +1,5 @@
+<%@page import="Entity.Usuario"%>
+<%@page import="java.util.Collections"%>
 <%@page import="java.util.Arrays"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="Entity.Juego"%>
@@ -5,10 +7,11 @@
 <%@page import="java.util.Iterator"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ include file="header.jsp" %>
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Lista de Juegos</title>
+        <title>Mostrar Juegos</title>
         <style>
             .container {
                 display: flex;
@@ -55,6 +58,29 @@
                 cursor: pointer;
                 border-radius: 5px;
             }
+
+            label {
+                margin-right: 5px;
+            }
+
+            input[type="checkbox"] {
+                margin-right: 5px;
+            }
+
+            input[type="submit"] {
+                padding: 8px;
+                margin-top: 10px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            
+            .listaConsolas{
+                margin-top: .5em;
+            }
+
         </style>
     </head>
     <body>
@@ -65,8 +91,7 @@
             <div class="filters">
                 <form action="MostrarJuegos" method="post">
                     <label>Filtrar por consolas:</label><br>
-                    <%                    
-                        ArrayList<Consola> listaConsolas = (ArrayList<Consola>) request.getAttribute("listaConsolas");
+                    <%                        ArrayList<Consola> listaConsolas = (ArrayList<Consola>) request.getAttribute("listaConsolas");
 
                         if (listaConsolas != null) {
                             for (Consola consola : listaConsolas) {
@@ -93,15 +118,22 @@
                     session = request.getSession();
                     ArrayList<Juego> listaJuegos = (ArrayList<Juego>) request.getAttribute("listaJuegos");
 
+                    
+                    // Ordenar la lista de juegos alfabéticamente por el nombre
+                    Collections.sort(listaJuegos, ( j1,     j2) -> j1.getNombre().compareTo(j2.getNombre()));
+
                     Usuario usuario = (Usuario) session.getAttribute("usuario");
                     if (listaJuegos != null) {
                         Iterator<Juego> iterator = listaJuegos.iterator();
 
                         while (iterator.hasNext()) {
                             Juego juego = iterator.next();
+                            ArrayList<Consola> consolasPorJuego = (ArrayList<Consola>) request.getAttribute("consolasPorJuego_" + juego.getId_juego());
 
                             String tipoProducto = "juego";
                             String idProducto = "J" + juego.getId_juego();
+
+                            
                 %>
                 <div class="card">
                     <h3><%= juego.getNombre()%></h3>
@@ -111,18 +143,31 @@
                     <p>Puntuación Metacritic: <%= juego.getPuntuacion_metacritic()%></p>
                     <p>Precio: <%= juego.getPrecio()%></p>
                     <p>Unidades Disponibles: <%= juego.getUnidadesDisponibles()%></p>
-                    <form action="agregarAlCarro" method="post">
+                    
+                    <!-- Mostrar las consolas asociadas al juego -->
+                    <h4>Consolas:</h4>
+                    <div class="listaConsolas">
+                        <% if (consolasPorJuego != null && !consolasPorJuego.isEmpty()) { %>
+                            <% for (Consola consola : consolasPorJuego) { %>
+                                <p><%= consola.getNombre() %></p>
+                            <% } %>
+                        <% } else { %>
+                            <p>No hay consolas asociadas a este juego.</p>
+                        <% } %>
+                    </div>
+                    
+                    <form action="AgregarAlCarro" method="post">
                         <input type="hidden" name="tipoProducto" value="<%= tipoProducto%>" />
                         <input type="hidden" name="idProducto" value="<%= idProducto%>" />
                         <%
-                        if (usuario != null) {
-                            Usuario.RolUsuario rolUsuario = usuario.getTipodeusuario();
+                            if (usuario != null) {
+                                Usuario.RolUsuario rolUsuario = usuario.getTipodeusuario();
 
-                            if (usuario != null && (rolUsuario == Usuario.RolUsuario.Administrador
-                                    || rolUsuario == Usuario.RolUsuario.Usuario)) { %>
-                    <input type="submit" class="comprar-button" name="comprar" value="Comprar">
-                    <% }
-                        }%>
+                                if (usuario != null && (rolUsuario == Usuario.RolUsuario.Administrador
+                                        || rolUsuario == Usuario.RolUsuario.Usuario)) { %>
+                        <input type="submit" class="comprar-button" name="comprar" value="Comprar">
+                        <% }
+                            }%>
                     </form>
                 </div>
                 <%

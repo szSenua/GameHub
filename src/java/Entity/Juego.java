@@ -24,6 +24,18 @@ public class Juego extends Producto {
         this.puntuacion_metacritic = puntuacion_metacritic;
         this.setTipoDeProducto("Juego");
     }
+    
+    
+    public Juego() {
+        // Llama al constructor de la clase base (Producto)
+        super();
+        
+        this.id_juego = id_juego;
+        this.compania_desarrolladora = compania_desarrolladora;
+        this.genero = genero;
+        this.puntuacion_metacritic = puntuacion_metacritic;
+        this.setTipoDeProducto("Juego");
+    }
 
     public int getId_juego() {
         return id_juego;
