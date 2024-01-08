@@ -15,6 +15,8 @@
             * {
                 padding: 0;
                 margin: 0;
+                outline: none;
+                border: none;
                 box-sizing: border-box;
             }
 

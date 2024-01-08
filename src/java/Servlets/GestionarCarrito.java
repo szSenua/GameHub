@@ -91,17 +91,25 @@ public class GestionarCarrito extends HttpServlet {
             int idUsuario = usuario.getId_usuario();
 
             // Procesar la compra y verificar si fue exitosa
-            boolean compraExitosa = carritoDAO.procesarCompra(idUsuario, carrito);
+            int estadoCompra = carritoDAO.procesarCompra(idUsuario, carrito);
 
-            if (compraExitosa) {
+            if (estadoCompra == 0) {
                 int idTicket = CarritoDAO.ticket;
                 // La compra se procesó con éxito
                 // Redirigir a una página de confirmación
                 response.sendRedirect("confirmacionCompra.jsp");
+            } else if (estadoCompra == 1) {
+                // Saldo insuficiente
+                request.setAttribute("errorMensaje", "Saldo insuficiente. No se puede procesar la compra.");
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
+            } else if (estadoCompra == 2) {
+                // Stock insuficiente
+                request.setAttribute("errorMensaje", "Existencias insuficientes. No se puede procesar la compra.");
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
             } else {
-                // La compra no se procesó con éxito
-                // Redirigir a una página de error
-                response.sendRedirect(request.getContextPath() + "/errorCompra.jsp");
+                // Otro error
+                request.setAttribute("errorMensaje", "Error en la compra. Por favor, inténtelo de nuevo más tarde.");
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
             }
         }
 

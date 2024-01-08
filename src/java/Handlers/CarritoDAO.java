@@ -31,17 +31,22 @@ public class CarritoDAO {
 
     /**
      * Función que gestiona la compra
+     *
      * @param idUsuario
      * @param carrito
-     * @return 
+     * @return
      */
-    public boolean procesarCompra(int idUsuario, Carrito carrito) {
+    public int procesarCompra(int idUsuario, Carrito carrito) {
         Connection connection = miConexion.getMiConexion();
 
         try {
             // Verificar existencias y saldo antes de procesar la compra
-            if (!verificarExistencias(carrito) || !verificarSaldoUsuario(idUsuario, carrito)) {
-                return false; // La compra no se puede procesar debido a falta de existencias o saldo insuficiente
+            if (!verificarExistencias(carrito)) {
+                return 2; // Código de estado 2: Existencias insuficientes
+            }
+
+            if (!verificarSaldoUsuario(idUsuario, carrito)) {
+                return 1; // Código de estado 1: Saldo insuficiente
             }
 
             // Crear un nuevo ticket
@@ -68,12 +73,12 @@ public class CarritoDAO {
             // Vaciar el carrito
             carrito.vaciarCarrito();
 
-            return true; // La compra se procesó con éxito
+            return 0; // Código de estado 0: Compra exitosa
 
         } catch (SQLException e) {
             e.printStackTrace();
 
-            return false; // La compra no se procesó con éxito
+            return -1; // Código de estado -1: Error en la compra
         }
     }
 
