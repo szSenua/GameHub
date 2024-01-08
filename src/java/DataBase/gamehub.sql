@@ -17,9 +17,20 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
---
--- Base de datos: `gamehub`
---
+-- Crear la base de datos gamehub
+CREATE DATABASE IF NOT EXISTS gamehub;
+
+-- Usar la base de datos gamehub
+USE gamehub;
+
+-- Crear el usuario gamehub
+CREATE USER 'gamehub'@'localhost' IDENTIFIED BY '1234';
+
+-- Otorgar privilegios al usuario gamehub para la base de datos gamehub
+GRANT ALL PRIVILEGES ON *.* TO 'gamehub'@'localhost';
+
+-- Asegurarse de que los cambios en los privilegios surtan efecto
+FLUSH PRIVILEGES;
 
 -- --------------------------------------------------------
 
