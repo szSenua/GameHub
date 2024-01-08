@@ -1,0 +1,9 @@
+Usuario de la base de datos:
+gamehub -> 1234
+
+Usuarios de la aplicación
+Administrador:
+Senua -> 1234
+
+Usuario
+Senua2 -> 1234
