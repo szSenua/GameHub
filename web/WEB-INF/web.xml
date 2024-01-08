@@ -10,4 +10,8 @@
             <max-age>43200</max-age> <!-- 43200 seconds = 12 hours -->
         </cookie-config>
     </session-config>
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
 </web-app>
